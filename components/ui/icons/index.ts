@@ -15,3 +15,6 @@ export type {
 
 export * from "./named-icons";
 export * from "./selection-two-icons";
+export * from "./guild-discovery-icons";
+export * from "./friends-icons";
+export * from "./guild-icons";

@@ -1,20 +1,28 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
   color-scheme: dark;
+  --font-primary: "gg sans", "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-  /* Original Discord palette: https://www.color-hex.com/color-palette/28549 */
-  --discord-blurple: #7289da;
-  --discord-gray: #424549;
-  --discord-dark: #36393e;
-  --discord-darker: #282b30;
-  --discord-darkest: #1e2124;
+  /* App surfaces + brand. */
+  --discord-blurple: #5865f2;
+  --discord-blurple-hover: #4452bc;
+  --discord-gray: #2b2b30;
+  --discord-muted: #97979f;
+  --discord-chat: #2f3035;
+  --discord-dark: #1a1a1e;
+  --discord-darker: #1a1a1e;
+  --discord-darkest: #0c0c0d;
 
   /* Discord desktop dark theme. */
-  --discord-neutral-900: #202225;
-  --discord-neutral-800: #292b2f;
-  --discord-neutral-700: #2f3136;
-  --discord-neutral-600: #40444b;
+  --discord-neutral-900: #0c0c0d;
+  --discord-neutral-800: #1a1a1e;
+  --discord-neutral-700: #242429;
+  --discord-neutral-600: #2f3035;
 
   /* Discord pinks. */
   --discord-pink-1: #fcb2c5;
@@ -23,8 +31,10 @@
   --discord-pink-4: #ffd1dc;
   --discord-pink-5: #fbc7ff;
 
-  /* Discord role colors. */
-  --discord-role-red: #ed5555;
+  /* Discord role / danger colors. */
+  --discord-role-red: #d13b41;
+  --discord-danger: #da3e44;
+  --discord-danger-hover: #d22d39;
   --discord-role-green: #b4c468;
   --discord-role-purple: #b8a7ea;
   --discord-role-aqua: #b7e0dc;
@@ -52,22 +62,29 @@
   --discord-blue-5: #001c81;
 
   /* Semantic tokens for the future UI kit. */
-  --background: var(--discord-dark);
-  --foreground: #ffffff;
-  --card: var(--discord-gray);
+  --background: var(--discord-darkest);
+  --foreground: #f2f3f5;
+  --card: var(--discord-dark);
   --card-foreground: var(--foreground);
-  --popover: var(--discord-darker);
+  --popover: var(--discord-dark);
   --popover-foreground: var(--foreground);
   --primary: var(--discord-blurple);
+  --primary-hover: var(--discord-blurple-hover);
   --primary-foreground: #ffffff;
-  --secondary: var(--discord-gray);
-  --secondary-foreground: var(--foreground);
-  --muted: var(--discord-darker);
-  --muted-foreground: #b9bbbe;
+  --secondary: var(--discord-dark);
+  --secondary-hover: var(--discord-chat);
+  --secondary-foreground: var(--discord-muted);
+  --muted: var(--discord-neutral-700);
+  --muted-foreground: var(--discord-muted);
   --accent: var(--discord-blurple);
   --accent-foreground: #ffffff;
-  --border: var(--discord-darker);
-  --input: var(--discord-darkest);
+  --destructive: var(--discord-danger);
+  --destructive-hover: var(--discord-danger-hover);
+  --destructive-foreground: #ffffff;
+  --destructive-foreground-muted: var(--discord-role-red);
+  --chat: var(--discord-chat);
+  --border: var(--discord-neutral-700);
+  --input: var(--discord-dark);
   --ring: var(--discord-blurple);
   --radius: 0.5rem;
 
@@ -81,9 +98,9 @@
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--discord-blurple);
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: var(--discord-gray);
+  --sidebar-accent: var(--discord-dark);
   --sidebar-accent-foreground: var(--foreground);
-  --sidebar-border: var(--discord-darker);
+  --sidebar-border: var(--discord-neutral-700);
   --sidebar-ring: var(--discord-blurple);
 }
 
@@ -95,8 +112,10 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
@@ -105,6 +124,11 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-hover: var(--destructive-hover);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-foreground-muted: var(--destructive-foreground-muted);
+  --color-chat: var(--chat);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -119,7 +143,10 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-discord-blurple: var(--discord-blurple);
+  --color-discord-blurple-hover: var(--discord-blurple-hover);
   --color-discord-gray: var(--discord-gray);
+  --color-discord-muted: var(--discord-muted);
+  --color-discord-chat: var(--discord-chat);
   --color-discord-dark: var(--discord-dark);
   --color-discord-darker: var(--discord-darker);
   --color-discord-darkest: var(--discord-darkest);
@@ -133,6 +160,8 @@
   --color-discord-pink-4: var(--discord-pink-4);
   --color-discord-pink-5: var(--discord-pink-5);
   --color-discord-role-red: var(--discord-role-red);
+  --color-discord-danger: var(--discord-danger);
+  --color-discord-danger-hover: var(--discord-danger-hover);
   --color-discord-role-green: var(--discord-role-green);
   --color-discord-role-purple: var(--discord-role-purple);
   --color-discord-role-aqua: var(--discord-role-aqua);
@@ -156,6 +185,11 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --font-heading: var(--font-primary);
+  --font-sans: var(--font-primary);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 * {
@@ -169,9 +203,6 @@ body {
 
 body {
   margin: 0;
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 .icon-catalog {
@@ -250,7 +281,7 @@ body {
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
   border-radius: 14px;
-  background: color-mix(in srgb, var(--discord-darkest) 72%, transparent);
+  background: color-mix(in srgb, var(--discord-dark) 88%, transparent);
 }
 
 .icon-card svg {
@@ -276,5 +307,17 @@ body {
 
   .icon-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
   }
 }

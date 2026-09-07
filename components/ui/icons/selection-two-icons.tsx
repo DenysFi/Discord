@@ -1,9 +1,7 @@
 import type { NamedDiscordIcon, NamedDiscordIconProps } from "./discord-icons";
+import { IconAsset } from "./icon-asset";
 
-const SHEET_WIDTH = 1500;
-const SHEET_HEIGHT = 4685;
-const TILE_SIZE = 100;
-const SHEET_URL = "/discord-icons/profiles-and-messages.svg";
+const ICON_DIRECTORY = "/discord-icons/individual";
 
 const tile = <const TName extends string, const TGroup extends string>(
   name: TName,
@@ -271,7 +269,8 @@ export type SelectionTwoIconProps = NamedDiscordIconProps & {
 export function SelectionTwoIcon({
   name,
   label,
-  size = 24,
+  size = 20,
+  colorMode = "currentColor",
   role,
   ref,
   ...props
@@ -280,18 +279,15 @@ export function SelectionTwoIcon({
   if (!definition) return null;
 
   return (
-    <svg
+    <IconAsset
       {...props}
       ref={ref}
-      aria-label={label ?? definition.label}
+      asset={`${ICON_DIRECTORY}/${definition.name}.svg`}
+      colorMode={colorMode}
+      label={label ?? definition.label}
       role={role ?? "img"}
-      viewBox={`${definition.x} ${definition.y} ${TILE_SIZE} ${TILE_SIZE}`}
-      width={size}
-      height={size}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <image href={SHEET_URL} width={SHEET_WIDTH} height={SHEET_HEIGHT} />
-    </svg>
+      size={size}
+    />
   );
 }
 
