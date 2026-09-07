@@ -1,9 +1,7 @@
 import type { ComponentPropsWithRef, ReactElement } from "react"
+import { IconAsset, type IconColorMode } from "./icon-asset"
 
-const SHEET_WIDTH = 1603
-const SHEET_HEIGHT = 2303
-const TILE_SIZE = 100
-const SHEET_URL = "/discord-icons/user-settings.svg"
+const ICON_DIRECTORY = "/discord-icons/individual"
 
 const icon = (
 	name: string,
@@ -140,6 +138,7 @@ export const discordIconGroups = [
 ]
 
 export type DiscordIconProps = Omit<ComponentPropsWithRef<"svg">, "name"> & {
+	colorMode?: IconColorMode
 	name: DiscordIconName
 	label?: string
 	size?: number | string
@@ -156,7 +155,8 @@ export type NamedDiscordIcon = ((
 export function DiscordIcon({
 	name,
 	label,
-	size = 24,
+	size = 20,
+	colorMode = "currentColor",
 	role,
 	ref,
 	...props
@@ -168,18 +168,15 @@ export function DiscordIcon({
 	const accessibleLabel = label ?? definition.label
 
 	return (
-		<svg
+		<IconAsset
 			{...props}
 			ref={ref}
-			aria-label={accessibleLabel}
+			asset={`${ICON_DIRECTORY}/${definition.name}.svg`}
+			colorMode={colorMode}
+			label={accessibleLabel}
 			role={role ?? "img"}
-			viewBox={`${definition.x} ${definition.y} ${TILE_SIZE} ${TILE_SIZE}`}
-			width={size}
-			height={size}
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<image href={SHEET_URL} width={SHEET_WIDTH} height={SHEET_HEIGHT} />
-		</svg>
+			size={size}
+		/>
 	)
 }
 
