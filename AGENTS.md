@@ -7,3 +7,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Attached assets
+
+Treat attached images and other files as reference material by default. Do not
+copy, move, or otherwise add an attachment to the repository unless the user
+explicitly asks for that attachment to be included as a project asset.

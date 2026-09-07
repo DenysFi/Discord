@@ -1,0 +1,280 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+
+  /* Original Discord palette: https://www.color-hex.com/color-palette/28549 */
+  --discord-blurple: #7289da;
+  --discord-gray: #424549;
+  --discord-dark: #36393e;
+  --discord-darker: #282b30;
+  --discord-darkest: #1e2124;
+
+  /* Discord desktop dark theme. */
+  --discord-neutral-900: #202225;
+  --discord-neutral-800: #292b2f;
+  --discord-neutral-700: #2f3136;
+  --discord-neutral-600: #40444b;
+
+  /* Discord pinks. */
+  --discord-pink-1: #fcb2c5;
+  --discord-pink-2: #fcb9ca;
+  --discord-pink-3: #fcc1d0;
+  --discord-pink-4: #ffd1dc;
+  --discord-pink-5: #fbc7ff;
+
+  /* Discord role colors. */
+  --discord-role-red: #ed5555;
+  --discord-role-green: #b4c468;
+  --discord-role-purple: #b8a7ea;
+  --discord-role-aqua: #b7e0dc;
+  --discord-role-sage: #bdd1a0;
+
+  /* Discord purples. */
+  --discord-purple-1: #cab2fb;
+  --discord-purple-2: #7e61ab;
+  --discord-purple-3: #9656ce;
+  --discord-purple-4: #5b209a;
+  --discord-purple-5: #36135a;
+
+  /* Discord greens. */
+  --discord-green-1: #7da565;
+  --discord-green-2: #287e29;
+  --discord-green-3: #34e718;
+  --discord-green-4: #085c12;
+  --discord-green-5: #37ff77;
+
+  /* Discord blues. */
+  --discord-blue-1: #7785cc;
+  --discord-blue-2: #002bff;
+  --discord-blue-3: #2a4d7e;
+  --discord-blue-4: #adf5ff;
+  --discord-blue-5: #001c81;
+
+  /* Semantic tokens for the future UI kit. */
+  --background: var(--discord-dark);
+  --foreground: #ffffff;
+  --card: var(--discord-gray);
+  --card-foreground: var(--foreground);
+  --popover: var(--discord-darker);
+  --popover-foreground: var(--foreground);
+  --primary: var(--discord-blurple);
+  --primary-foreground: #ffffff;
+  --secondary: var(--discord-gray);
+  --secondary-foreground: var(--foreground);
+  --muted: var(--discord-darker);
+  --muted-foreground: #b9bbbe;
+  --accent: var(--discord-blurple);
+  --accent-foreground: #ffffff;
+  --border: var(--discord-darker);
+  --input: var(--discord-darkest);
+  --ring: var(--discord-blurple);
+  --radius: 0.5rem;
+
+  --chart-1: var(--discord-blurple);
+  --chart-2: var(--discord-gray);
+  --chart-3: var(--discord-dark);
+  --chart-4: var(--discord-darker);
+  --chart-5: var(--discord-darkest);
+
+  --sidebar: var(--discord-darkest);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--discord-blurple);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--discord-gray);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--discord-darker);
+  --sidebar-ring: var(--discord-blurple);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-discord-blurple: var(--discord-blurple);
+  --color-discord-gray: var(--discord-gray);
+  --color-discord-dark: var(--discord-dark);
+  --color-discord-darker: var(--discord-darker);
+  --color-discord-darkest: var(--discord-darkest);
+  --color-discord-neutral-900: var(--discord-neutral-900);
+  --color-discord-neutral-800: var(--discord-neutral-800);
+  --color-discord-neutral-700: var(--discord-neutral-700);
+  --color-discord-neutral-600: var(--discord-neutral-600);
+  --color-discord-pink-1: var(--discord-pink-1);
+  --color-discord-pink-2: var(--discord-pink-2);
+  --color-discord-pink-3: var(--discord-pink-3);
+  --color-discord-pink-4: var(--discord-pink-4);
+  --color-discord-pink-5: var(--discord-pink-5);
+  --color-discord-role-red: var(--discord-role-red);
+  --color-discord-role-green: var(--discord-role-green);
+  --color-discord-role-purple: var(--discord-role-purple);
+  --color-discord-role-aqua: var(--discord-role-aqua);
+  --color-discord-role-sage: var(--discord-role-sage);
+  --color-discord-purple-1: var(--discord-purple-1);
+  --color-discord-purple-2: var(--discord-purple-2);
+  --color-discord-purple-3: var(--discord-purple-3);
+  --color-discord-purple-4: var(--discord-purple-4);
+  --color-discord-purple-5: var(--discord-purple-5);
+  --color-discord-green-1: var(--discord-green-1);
+  --color-discord-green-2: var(--discord-green-2);
+  --color-discord-green-3: var(--discord-green-3);
+  --color-discord-green-4: var(--discord-green-4);
+  --color-discord-green-5: var(--discord-green-5);
+  --color-discord-blue-1: var(--discord-blue-1);
+  --color-discord-blue-2: var(--discord-blue-2);
+  --color-discord-blue-3: var(--discord-blue-3);
+  --color-discord-blue-4: var(--discord-blue-4);
+  --color-discord-blue-5: var(--discord-blue-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.icon-catalog {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 64px 0 96px;
+}
+
+.icon-catalog__header {
+  padding-bottom: 36px;
+  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+}
+
+.icon-catalog__header h1 {
+  margin: 8px 0 12px;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+}
+
+.icon-catalog__header p {
+  margin: 0;
+  color: var(--muted-foreground);
+}
+
+.icon-catalog__eyebrow {
+  color: var(--primary) !important;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.icon-group {
+  padding-top: 44px;
+}
+
+.icon-group__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.icon-group__heading h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.icon-group__heading span {
+  min-width: 28px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.icon-card {
+  display: grid;
+  min-height: 138px;
+  place-items: center;
+  align-content: center;
+  gap: 14px;
+  padding: 16px 10px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--discord-darkest) 72%, transparent);
+}
+
+.icon-card svg {
+  display: block;
+  flex: none;
+}
+
+.icon-card code {
+  width: 100%;
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .icon-catalog {
+    width: min(100% - 20px, 1180px);
+    padding-top: 36px;
+  }
+
+  .icon-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
