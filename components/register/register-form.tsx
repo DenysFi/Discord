@@ -1,7 +1,10 @@
 "use client"
 
+import { useSignUp } from "@clerk/nextjs"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { type FormEvent, useState } from "react"
 import { Controller, type Control, useForm } from "react-hook-form"
 
 import { AuthPanel } from "@/components/auth/auth-panel"
@@ -30,6 +33,7 @@ import {
 	registerSchema,
 	type RegisterFormValues,
 } from "@/lib/validation/auth"
+import { getClerkErrorMessage } from "@/lib/clerk-error"
 
 const MONTHS = [
 	"Январь",
@@ -113,6 +117,11 @@ function BirthDateSelect({
 }
 
 export function RegisterForm() {
+	const { signUp, fetchStatus, errors: clerkErrors } = useSignUp()
+	const router = useRouter()
+	const [isVerifying, setIsVerifying] = useState(false)
+	const [verificationCode, setVerificationCode] = useState("")
+	const [verificationError, setVerificationError] = useState<string>()
 	const form = useForm<RegisterFormValues>({
 		resolver: zodResolver(registerSchema),
 		defaultValues: {
@@ -129,9 +138,159 @@ export function RegisterForm() {
 		mode: "onTouched",
 	})
 	const { errors } = form.formState
-	const hasErrors = Object.keys(errors).length > 0
+	const emailError = errors.email ?? clerkErrors.fields.emailAddress ?? undefined
+	const passwordError = errors.password ?? clerkErrors.fields.password ?? undefined
+	const usernameError = errors.username ?? clerkErrors.fields.username ?? undefined
+	const hasClerkErrors =
+		Object.values(clerkErrors.fields).some(Boolean) ||
+		Boolean(clerkErrors.global?.length)
+	const hasErrors = Object.keys(errors).length > 0 || hasClerkErrors
 	const birthDateError =
 		errors.birthDay ?? errors.birthMonth ?? errors.birthYear
+	const isSubmitting =
+		form.formState.isSubmitting || fetchStatus === "fetching"
+
+	async function finalizeSignUp() {
+		const { error } = await signUp.finalize({
+			navigate: ({ decorateUrl }) => {
+				const url = decorateUrl("/")
+
+				if (url.startsWith("http")) {
+					window.location.assign(url)
+					return
+				}
+
+				router.replace(url)
+			},
+		})
+
+		if (error) {
+			setVerificationError(
+				getClerkErrorMessage(error, "Не удалось завершить регистрацию."),
+			)
+		}
+	}
+
+	async function onSubmit(values: RegisterFormValues) {
+		form.clearErrors("root")
+
+		try {
+			const birthDate = `${values.birthYear}-${values.birthMonth.padStart(2, "0")}-${values.birthDay.padStart(2, "0")}`
+			const { error } = await signUp.password({
+				emailAddress: values.email,
+				password: values.password,
+				unsafeMetadata: {
+					birthDate,
+					displayName: values.displayName,
+					marketing: values.marketing,
+					username: values.username,
+				},
+			})
+
+			if (error) {
+				form.setError("root", {
+					message: getClerkErrorMessage(
+						error,
+						"Не удалось создать учётную запись.",
+					),
+				})
+				return
+			}
+
+			if (signUp.status === "complete") {
+				await finalizeSignUp()
+				return
+			}
+
+			const { error: sendCodeError } =
+				await signUp.verifications.sendEmailCode()
+
+			if (sendCodeError) {
+				form.setError("root", {
+					message: getClerkErrorMessage(
+						sendCodeError,
+						"Не удалось отправить код подтверждения.",
+					),
+				})
+				return
+			}
+
+			setIsVerifying(true)
+		} catch {
+			form.setError("root", {
+				message: "Не удалось связаться с сервисом авторизации.",
+			})
+		}
+	}
+
+	async function verifyEmail(event: FormEvent<HTMLFormElement>) {
+		event.preventDefault()
+		setVerificationError(undefined)
+
+		if (!verificationCode.trim()) {
+			setVerificationError("Введите код из письма.")
+			return
+		}
+
+		try {
+			const { error } = await signUp.verifications.verifyEmailCode({
+				code: verificationCode.trim(),
+			})
+
+			if (error) {
+				setVerificationError(
+					getClerkErrorMessage(error, "Код подтверждения недействителен."),
+				)
+				return
+			}
+
+			if (signUp.status === "complete") {
+				await finalizeSignUp()
+				return
+			}
+
+			setVerificationError(
+				"Для завершения регистрации требуются дополнительные данные.",
+			)
+		} catch {
+			setVerificationError("Не удалось проверить код. Попробуйте ещё раз.")
+		}
+	}
+
+	if (isVerifying) {
+		return (
+			<AuthPanel orientation="vertical" className="w-full max-w-[480px]">
+				<form className="flex w-full flex-col gap-5" onSubmit={verifyEmail}>
+					<header className="flex flex-col gap-2 text-center">
+						<TypographyH1>Подтвердите e-mail</TypographyH1>
+						<TypographyMuted>
+							Мы отправили код подтверждения на {form.getValues("email")}.
+						</TypographyMuted>
+					</header>
+					<Field data-invalid={!!verificationError}>
+						<FieldLabel htmlFor="register-code">
+							Код подтверждения <RequiredMark />
+						</FieldLabel>
+						<Input
+							id="register-code"
+							type="text"
+							inputMode="numeric"
+							autoComplete="one-time-code"
+							value={verificationCode}
+							onChange={event => setVerificationCode(event.target.value)}
+							aria-invalid={!!verificationError}
+							aria-required="true"
+							autoFocus
+						/>
+						<FieldError>{verificationError}</FieldError>
+					</Field>
+					<Button type="submit" size="lg" disabled={fetchStatus === "fetching"}>
+						{fetchStatus === "fetching" ? "Проверяем…" : "Подтвердить e-mail"}
+					</Button>
+				</form>
+			</AuthPanel>
+		)
+	}
 
 	return (
 		<AuthPanel
@@ -142,7 +301,7 @@ export function RegisterForm() {
 				data-slot="register-form"
 				data-invalid={hasErrors}
 				className="group/register-form flex w-full flex-col gap-3 data-[invalid=true]:gap-2"
-				onSubmit={form.handleSubmit(() => undefined)}
+				onSubmit={form.handleSubmit(onSubmit)}
 				noValidate
 			>
 				<header className="text-center">
@@ -152,7 +311,7 @@ export function RegisterForm() {
 				<FieldGroup className="gap-2 group-data-[invalid=true]/register-form:gap-1">
 					<Field
 						className="gap-1.5 group-data-[invalid=true]/register-form:gap-1"
-						data-invalid={!!errors.email}
+						data-invalid={!!emailError}
 					>
 						<FieldLabel htmlFor="register-email">
 							E-mail <RequiredMark />
@@ -163,12 +322,12 @@ export function RegisterForm() {
 							size="sm"
 							autoComplete="email"
 							aria-required="true"
-							aria-invalid={!!errors.email}
+							aria-invalid={!!emailError}
 							{...form.register("email")}
 						/>
 						<FieldError
 							className="text-xs leading-tight"
-							errors={[errors.email]}
+							errors={[emailError]}
 						/>
 					</Field>
 
@@ -195,7 +354,7 @@ export function RegisterForm() {
 
 					<Field
 						className="gap-1.5 group-data-[invalid=true]/register-form:gap-1"
-						data-invalid={!!errors.username}
+						data-invalid={!!usernameError}
 					>
 						<FieldLabel htmlFor="register-username">
 							Имя пользователя <RequiredMark />
@@ -206,18 +365,18 @@ export function RegisterForm() {
 							size="sm"
 							autoComplete="username"
 							aria-required="true"
-							aria-invalid={!!errors.username}
+							aria-invalid={!!usernameError}
 							{...form.register("username")}
 						/>
 						<FieldError
 							className="text-xs leading-tight"
-							errors={[errors.username]}
+							errors={[usernameError]}
 						/>
 					</Field>
 
 					<Field
 						className="gap-1.5 group-data-[invalid=true]/register-form:gap-1"
-						data-invalid={!!errors.password}
+						data-invalid={!!passwordError}
 					>
 						<FieldLabel htmlFor="register-password">
 							Пароль <RequiredMark />
@@ -228,12 +387,12 @@ export function RegisterForm() {
 							size="sm"
 							autoComplete="new-password"
 							aria-required="true"
-							aria-invalid={!!errors.password}
+							aria-invalid={!!passwordError}
 							{...form.register("password")}
 						/>
 						<FieldError
 							className="text-xs leading-tight"
-							errors={[errors.password]}
+							errors={[passwordError]}
 						/>
 					</Field>
 
@@ -358,9 +517,11 @@ export function RegisterForm() {
 							type="submit"
 							size="lg"
 							className="w-full"
-							disabled={form.formState.isSubmitting}
+							disabled={isSubmitting}
 						>
-							Создать учётную запись
+							{isSubmitting
+								? "Создаём учётную запись…"
+								: "Создать учётную запись"}
 						</Button>
 						<TypographyMuted>
 							Уже зарегистрированы?{" "}
