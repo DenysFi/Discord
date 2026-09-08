@@ -1,14 +1,13 @@
 "use client"
 
-import { useSignUp } from "@clerk/nextjs"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { type FormEvent, useState } from "react"
 import { Controller, type Control, useForm } from "react-hook-form"
 
 import { AuthPanel } from "@/components/auth/auth-panel"
 import { AuthSwitchLink } from "@/components/auth/auth-transition"
+import { AuthVerificationForm } from "@/components/auth/auth-verification-form"
+import { useSignUpFlow } from "@/components/register/use-sign-up-flow"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -34,7 +33,6 @@ import {
 	registerSchema,
 	type RegisterFormValues,
 } from "@/lib/validation/auth"
-import { getClerkErrorMessage } from "@/lib/clerk-error"
 
 const MONTHS = [
 	"Январь",
@@ -118,11 +116,13 @@ function BirthDateSelect({
 }
 
 export function RegisterForm() {
-	const { signUp, fetchStatus, errors: clerkErrors } = useSignUp()
-	const router = useRouter()
-	const [isVerifying, setIsVerifying] = useState(false)
-	const [verificationCode, setVerificationCode] = useState("")
-	const [verificationError, setVerificationError] = useState<string>()
+	const {
+		step,
+		signUpMutation,
+		verificationMutation,
+		fieldErrors,
+		globalErrors,
+	} = useSignUpFlow()
 	const form = useForm<RegisterFormValues>({
 		resolver: zodResolver(registerSchema),
 		defaultValues: {
@@ -139,157 +139,46 @@ export function RegisterForm() {
 		mode: "onTouched",
 	})
 	const { errors } = form.formState
-	const emailError = errors.email ?? clerkErrors.fields.emailAddress ?? undefined
-	const passwordError = errors.password ?? clerkErrors.fields.password ?? undefined
-	const usernameError = errors.username ?? clerkErrors.fields.username ?? undefined
+	const emailError = errors.email ?? fieldErrors.emailAddress ?? undefined
+	const passwordError = errors.password ?? fieldErrors.password ?? undefined
+	const usernameError = errors.username ?? fieldErrors.username ?? undefined
 	const hasClerkErrors =
-		Object.values(clerkErrors.fields).some(Boolean) ||
-		Boolean(clerkErrors.global?.length)
-	const hasErrors = Object.keys(errors).length > 0 || hasClerkErrors
+		Object.values(fieldErrors).some(Boolean) || Boolean(globalErrors?.length)
+	const hasErrors =
+		Object.keys(errors).length > 0 ||
+		hasClerkErrors ||
+		Boolean(signUpMutation.error)
 	const birthDateError =
 		errors.birthDay ?? errors.birthMonth ?? errors.birthYear
-	const isSubmitting =
-		form.formState.isSubmitting || fetchStatus === "fetching"
+	const isSubmitting = signUpMutation.isPending
+	// Clerk reports the same problem both per field and per request; show it once.
+	const shownFieldMessages = new Set(
+		[emailError, passwordError, usernameError, birthDateError].map(
+			error => error?.message,
+		),
+	)
+	const submitErrors = [
+		signUpMutation.error ?? undefined,
+		...(globalErrors ?? []),
+	].filter(error => error && !shownFieldMessages.has(error.message))
 
-	async function finalizeSignUp() {
-		const { error } = await signUp.finalize({
-			navigate: ({ decorateUrl }) => {
-				const url = decorateUrl("/")
-
-				if (url.startsWith("http")) {
-					window.location.assign(url)
-					return
-				}
-
-				router.replace(url)
-			},
-		})
-
-		if (error) {
-			setVerificationError(
-				getClerkErrorMessage(error, "Не удалось завершить регистрацию."),
-			)
-		}
-	}
-
-	async function onSubmit(values: RegisterFormValues) {
-		form.clearErrors("root")
-
-		try {
-			const birthDate = `${values.birthYear}-${values.birthMonth.padStart(2, "0")}-${values.birthDay.padStart(2, "0")}`
-			const { error } = await signUp.password({
-				emailAddress: values.email,
-				password: values.password,
-				unsafeMetadata: {
-					birthDate,
-					displayName: values.displayName,
-					marketing: values.marketing,
-					username: values.username,
-				},
-			})
-
-			if (error) {
-				form.setError("root", {
-					message: getClerkErrorMessage(
-						error,
-						"Не удалось создать учётную запись.",
-					),
-				})
-				return
-			}
-
-			if (signUp.status === "complete") {
-				await finalizeSignUp()
-				return
-			}
-
-			const { error: sendCodeError } =
-				await signUp.verifications.sendEmailCode()
-
-			if (sendCodeError) {
-				form.setError("root", {
-					message: getClerkErrorMessage(
-						sendCodeError,
-						"Не удалось отправить код подтверждения.",
-					),
-				})
-				return
-			}
-
-			setIsVerifying(true)
-		} catch {
-			form.setError("root", {
-				message: "Не удалось связаться с сервисом авторизации.",
-			})
-		}
-	}
-
-	async function verifyEmail(event: FormEvent<HTMLFormElement>) {
-		event.preventDefault()
-		setVerificationError(undefined)
-
-		if (!verificationCode.trim()) {
-			setVerificationError("Введите код из письма.")
-			return
-		}
-
-		try {
-			const { error } = await signUp.verifications.verifyEmailCode({
-				code: verificationCode.trim(),
-			})
-
-			if (error) {
-				setVerificationError(
-					getClerkErrorMessage(error, "Код подтверждения недействителен."),
-				)
-				return
-			}
-
-			if (signUp.status === "complete") {
-				await finalizeSignUp()
-				return
-			}
-
-			setVerificationError(
-				"Для завершения регистрации требуются дополнительные данные.",
-			)
-		} catch {
-			setVerificationError("Не удалось проверить код. Попробуйте ещё раз.")
-		}
-	}
-
-	if (isVerifying) {
+	if (step === "verification") {
 		return (
-			<AuthPanel orientation="vertical" className="w-full max-w-[480px]">
-				<form className="flex w-full flex-col gap-5" onSubmit={verifyEmail}>
-					<header className="flex flex-col gap-2 text-center">
-						<TypographyH1>Подтвердите e-mail</TypographyH1>
-						<TypographyMuted>
-							Мы отправили код подтверждения на {form.getValues("email")}.
-						</TypographyMuted>
-					</header>
-					<Field data-invalid={!!verificationError}>
-						<FieldLabel htmlFor="register-code">
-							Код подтверждения <RequiredMark />
-						</FieldLabel>
-						<Input
-							id="register-code"
-							type="text"
-							inputMode="numeric"
-							autoComplete="one-time-code"
-							value={verificationCode}
-							onChange={event => setVerificationCode(event.target.value)}
-							aria-invalid={!!verificationError}
-							aria-required="true"
-							autoFocus
-						/>
-						<FieldError>{verificationError}</FieldError>
-					</Field>
-					<Button type="submit" size="lg" disabled={fetchStatus === "fetching"}>
-						{fetchStatus === "fetching" ? "Проверяем…" : "Подтвердить e-mail"}
-					</Button>
-				</form>
-			</AuthPanel>
+			<AuthVerificationForm
+				inputId="register-code"
+				title="Подтвердите e-mail"
+				description={`Мы отправили код подтверждения на ${form.getValues("email")}.`}
+				label={
+					<>
+						Код подтверждения <RequiredMark />
+					</>
+				}
+				submitLabel="Подтвердить e-mail"
+				pendingLabel="Проверяем…"
+				isPending={verificationMutation.isPending}
+				error={verificationMutation.error}
+				onSubmit={code => verificationMutation.mutate(code)}
+			/>
 		)
 	}
 
@@ -302,7 +191,7 @@ export function RegisterForm() {
 				data-slot="register-form"
 				data-invalid={hasErrors}
 				className="group/register-form flex w-full flex-col gap-3 data-[invalid=true]:gap-2"
-				onSubmit={form.handleSubmit(onSubmit)}
+				onSubmit={form.handleSubmit(values => signUpMutation.mutate(values))}
 				noValidate
 			>
 				<header className="text-center">
@@ -514,6 +403,10 @@ export function RegisterForm() {
 					</FieldGroup>
 
 					<Field className="gap-2">
+						<FieldError
+							className="text-xs leading-tight"
+							errors={submitErrors}
+						/>
 						<Button
 							type="submit"
 							size="lg"

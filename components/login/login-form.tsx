@@ -1,32 +1,35 @@
 "use client"
 
-import { useSignIn } from "@clerk/nextjs"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
-import { type FormEvent, useState } from "react"
 import { useForm } from "react-hook-form"
 
 import { AuthPanel } from "@/components/auth/auth-panel"
 import { AuthSwitchLink } from "@/components/auth/auth-transition"
+import { AuthVerificationForm } from "@/components/auth/auth-verification-form"
+import { useSignInFlow } from "@/components/login/use-sign-in-flow"
 import { Button } from "@/components/ui/button"
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
+import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {
 	TypographyH1,
 	TypographyMuted,
 	TypographyP,
 } from "@/components/ui/typography"
-import {
-	loginSchema,
-	type LoginFormValues,
-} from "@/lib/validation/auth"
-import { getClerkErrorMessage } from "@/lib/clerk-error"
+import { loginSchema, type LoginFormValues } from "@/lib/validation/auth"
+
 export function LoginForm() {
-	const { signIn, fetchStatus, errors: clerkErrors } = useSignIn()
-	const router = useRouter()
-	const [isVerifying, setIsVerifying] = useState(false)
-	const [verificationCode, setVerificationCode] = useState("")
-	const [verificationError, setVerificationError] = useState<string>()
+	const {
+		step,
+		signInMutation,
+		verificationMutation,
+		fieldErrors,
+		globalErrors,
+	} = useSignInFlow()
 	const form = useForm<LoginFormValues>({
 		resolver: zodResolver(loginSchema),
 		defaultValues: {
@@ -36,162 +39,40 @@ export function LoginForm() {
 		mode: "onTouched",
 	})
 
-	async function finalizeSignIn() {
-		const { error } = await signIn.finalize({
-			navigate: ({ decorateUrl }) => {
-				const url = decorateUrl("/")
-
-				if (url.startsWith("http")) {
-					window.location.assign(url)
-					return
-				}
-
-				router.replace(url)
-			},
-		})
-
-		if (error) {
-			form.setError("root", {
-				message: getClerkErrorMessage(error, "Не удалось завершить вход."),
-			})
-		}
-	}
-
-	async function verifySecondFactor(event: FormEvent<HTMLFormElement>) {
-		event.preventDefault()
-		setVerificationError(undefined)
-
-		if (!verificationCode.trim()) {
-			setVerificationError("Введите код из письма.")
-			return
-		}
-
-		try {
-			const { error } = await signIn.mfa.verifyEmailCode({
-				code: verificationCode.trim(),
-			})
-
-			if (error) {
-				setVerificationError(
-					getClerkErrorMessage(error, "Код подтверждения недействителен."),
-				)
-				return
-			}
-
-			if (signIn.status === "complete") {
-				await finalizeSignIn()
-				return
-			}
-
-			setVerificationError("Не удалось завершить дополнительную проверку.")
-		} catch {
-			setVerificationError("Не удалось проверить код. Попробуйте ещё раз.")
-		}
-	}
-
-	async function onSubmit(values: LoginFormValues) {
-		form.clearErrors("root")
-
-		try {
-			const { error } = await signIn.password({
-				identifier: values.identifier,
-				password: values.password,
-			})
-
-			if (error) {
-				form.setError("root", {
-					message: getClerkErrorMessage(error, "Проверьте данные для входа."),
-				})
-				return
-			}
-
-			if (signIn.status === "complete") {
-				await finalizeSignIn()
-				return
-			}
-
-			if (
-				(signIn.status === "needs_second_factor" ||
-					signIn.status === "needs_client_trust") &&
-				signIn.supportedSecondFactors.some(
-					factor => factor.strategy === "email_code",
-				)
-			) {
-				const { error: sendCodeError } = await signIn.mfa.sendEmailCode()
-
-				if (sendCodeError) {
-					form.setError("root", {
-						message: getClerkErrorMessage(
-							sendCodeError,
-							"Не удалось отправить код подтверждения.",
-						),
-					})
-					return
-				}
-
-				setIsVerifying(true)
-				return
-			}
-
-			form.setError("root", {
-				message: "Не удалось завершить вход. Попробуйте ещё раз.",
-			})
-		} catch {
-			form.setError("root", {
-				message: "Не удалось связаться с сервисом авторизации.",
-			})
-		}
-	}
-
-	if (isVerifying) {
+	if (step === "verification") {
 		return (
-			<AuthPanel orientation="vertical" className="w-full max-w-[480px]">
-				<form
-					className="flex w-full flex-col gap-5"
-					onSubmit={verifySecondFactor}
-				>
-					<header className="flex flex-col gap-2 text-center">
-						<TypographyH1>Подтвердите вход</TypographyH1>
-						<TypographyMuted>
-							Мы отправили код подтверждения на адрес вашей учётной записи.
-						</TypographyMuted>
-					</header>
-					<Field data-invalid={!!verificationError}>
-						<FieldLabel htmlFor="login-code">Код подтверждения</FieldLabel>
-						<Input
-							id="login-code"
-							type="text"
-							inputMode="numeric"
-							autoComplete="one-time-code"
-							value={verificationCode}
-							onChange={event => setVerificationCode(event.target.value)}
-							aria-invalid={!!verificationError}
-							aria-required="true"
-							autoFocus
-						/>
-						<FieldError>{verificationError}</FieldError>
-					</Field>
-					<Button type="submit" size="lg" disabled={fetchStatus === "fetching"}>
-						{fetchStatus === "fetching" ? "Проверяем…" : "Подтвердить вход"}
-					</Button>
-				</form>
-			</AuthPanel>
+			<AuthVerificationForm
+				inputId="login-code"
+				title="Подтвердите вход"
+				description="Мы отправили код подтверждения на адрес вашей учётной записи."
+				label="Код подтверждения"
+				submitLabel="Подтвердить вход"
+				pendingLabel="Проверяем…"
+				isPending={verificationMutation.isPending}
+				error={verificationMutation.error}
+				onSubmit={code => verificationMutation.mutate(code)}
+			/>
 		)
 	}
 
 	const identifierError =
-		form.formState.errors.identifier ?? clerkErrors.fields.identifier ?? undefined
+		form.formState.errors.identifier ?? fieldErrors.identifier ?? undefined
 	const passwordError =
-		form.formState.errors.password ?? clerkErrors.fields.password ?? undefined
-	const clerkGlobalErrors = clerkErrors.global?.map(error => ({
-		message: error.longMessage ?? error.message,
-	}))
+		form.formState.errors.password ?? fieldErrors.password ?? undefined
+	// Clerk reports the same problem both per field and per request; show it once.
+	const shownFieldMessages = new Set(
+		[identifierError, passwordError].map(error => error?.message),
+	)
+	const submitErrors = [
+		signInMutation.error ?? undefined,
+		...(globalErrors ?? []),
+	].filter(error => error && !shownFieldMessages.has(error.message))
 
 	return (
 		<AuthPanel orientation="vertical" className="w-full max-w-[480px]">
 			<form
 				className="flex w-full flex-col gap-5"
-				onSubmit={form.handleSubmit(onSubmit)}
+				onSubmit={form.handleSubmit(values => signInMutation.mutate(values))}
 				noValidate
 			>
 				<header className="flex flex-col gap-2 text-center">
@@ -229,26 +110,20 @@ export function LoginForm() {
 							{...form.register("password")}
 						/>
 						<FieldError errors={[passwordError]} />
+						<Button variant="link" className="w-fit justify-start">
+							Забыли пароль?
+						</Button>
 					</Field>
 
 					<Field className="gap-2">
-						<FieldError
-							errors={[
-								form.formState.errors.root,
-								...(clerkGlobalErrors ?? []),
-							]}
-						/>
+						<FieldError errors={submitErrors} />
 						<Button
 							type="submit"
 							size="lg"
 							className="w-full"
-							disabled={
-								form.formState.isSubmitting || fetchStatus === "fetching"
-							}
+							disabled={signInMutation.isPending}
 						>
-							{form.formState.isSubmitting || fetchStatus === "fetching"
-								? "Входим…"
-								: "Вход"}
+							{signInMutation.isPending ? "Входим…" : "Вход"}
 						</Button>
 						<TypographyMuted>
 							Нужна учётная запись?{" "}
