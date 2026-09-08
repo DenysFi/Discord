@@ -8,6 +8,7 @@ import { type FormEvent, useState } from "react"
 import { Controller, type Control, useForm } from "react-hook-form"
 
 import { AuthPanel } from "@/components/auth/auth-panel"
+import { AuthSwitchLink } from "@/components/auth/auth-transition"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -525,12 +526,12 @@ export function RegisterForm() {
 						</Button>
 						<TypographyMuted>
 							Уже зарегистрированы?{" "}
-							<Link
-								href="/sign-in"
+							<AuthSwitchLink
+								to="sign-in"
 								className="font-medium text-primary hover:underline"
 							>
 								Войти
-							</Link>
+							</AuthSwitchLink>
 						</TypographyMuted>
 					</Field>
 				</FieldGroup>

@@ -1,13 +1,13 @@
 "use client"
 
 import { useSignIn } from "@clerk/nextjs"
-import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { type FormEvent, useState } from "react"
 import { useForm } from "react-hook-form"
 
 import { AuthPanel } from "@/components/auth/auth-panel"
+import { AuthSwitchLink } from "@/components/auth/auth-transition"
 import { Button } from "@/components/ui/button"
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
@@ -252,12 +252,12 @@ export function LoginForm() {
 						</Button>
 						<TypographyMuted>
 							Нужна учётная запись?{" "}
-							<Link
-								href="/sign-up"
+							<AuthSwitchLink
+								to="sign-up"
 								className="font-medium text-primary hover:underline"
 							>
 								Зарегистрироваться
-							</Link>
+							</AuthSwitchLink>
 						</TypographyMuted>
 					</Field>
 				</FieldGroup>
