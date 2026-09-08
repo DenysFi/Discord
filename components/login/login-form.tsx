@@ -2,11 +2,13 @@
 
 import Link from "next/link"
 import QRCode from "qrcode"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useRef } from "react"
+import { useForm } from "react-hook-form"
 
 import { AuthPanel } from "@/components/auth/auth-panel"
 import { Button } from "@/components/ui/button"
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {
 	TypographyH1,
@@ -14,6 +16,10 @@ import {
 	TypographyMuted,
 	TypographyP,
 } from "@/components/ui/typography"
+import {
+	loginSchema,
+	type LoginFormValues,
+} from "@/lib/validation/auth"
 
 const LOGIN_QR_URL = "https://discord.com/login"
 
@@ -63,13 +69,21 @@ function LoginQrAside() {
 }
 
 export function LoginForm() {
+	const form = useForm<LoginFormValues>({
+		resolver: zodResolver(loginSchema),
+		defaultValues: {
+			identifier: "",
+			password: "",
+		},
+		mode: "onTouched",
+	})
+
 	return (
 		<AuthPanel orientation="horizontal" aside={<LoginQrAside />}>
 			<form
 				className="flex flex-col gap-5  w-[420px]"
-				onSubmit={event => {
-					event.preventDefault()
-				}}
+				onSubmit={form.handleSubmit(() => undefined)}
+				noValidate
 			>
 				<header className="flex flex-col gap-2 text-center">
 					<TypographyH1>С возвращением!</TypographyH1>
@@ -77,33 +91,35 @@ export function LoginForm() {
 				</header>
 
 				<FieldGroup className="gap-5">
-					<Field>
+					<Field data-invalid={!!form.formState.errors.identifier}>
 						<FieldLabel htmlFor="login-email">
 							Адрес электронной почты или номер телефона{" "}
 							<span className="text-destructive">*</span>
 						</FieldLabel>
 						<Input
 							id="login-email"
-							name="email"
 							type="text"
 							autoComplete="username"
-							required
 							aria-required="true"
+							aria-invalid={!!form.formState.errors.identifier}
+							{...form.register("identifier")}
 						/>
+						<FieldError errors={[form.formState.errors.identifier]} />
 					</Field>
 
-					<Field>
+					<Field data-invalid={!!form.formState.errors.password}>
 						<FieldLabel htmlFor="login-password">
 							Пароль <span className="text-destructive">*</span>
 						</FieldLabel>
 						<Input
 							id="login-password"
-							name="password"
 							type="password"
 							autoComplete="current-password"
-							required
 							aria-required="true"
+							aria-invalid={!!form.formState.errors.password}
+							{...form.register("password")}
 						/>
+						<FieldError errors={[form.formState.errors.password]} />
 						<Button
 							type="button"
 							variant="link"
@@ -114,13 +130,18 @@ export function LoginForm() {
 					</Field>
 
 					<Field className="gap-2">
-						<Button type="submit" size="lg" className="w-full">
+						<Button
+							type="submit"
+							size="lg"
+							className="w-full"
+							disabled={form.formState.isSubmitting}
+						>
 							Вход
 						</Button>
 						<TypographyMuted>
 							Нужна учётная запись?{" "}
 							<Link
-								href="/login"
+								href="/register"
 								className="font-medium text-primary hover:underline"
 							>
 								Зарегистрироваться
