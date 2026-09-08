@@ -11,7 +11,7 @@ function AuthLayout({ children, className }: AuthLayoutProps) {
     <main
       data-slot="auth-layout"
       className={cn(
-        "relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10",
+        "relative flex min-h-svh items-center justify-center overflow-hidden px-0 py-0 sm:px-4 sm:py-6",
         className
       )}
     >

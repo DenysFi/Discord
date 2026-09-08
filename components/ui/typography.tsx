@@ -6,7 +6,7 @@ function TypographyH1({ className, ...props }: ComponentProps<"h1">) {
 		<h1
 			data-slot="typography-h1"
 			className={cn(
-				"text-[30px] font-semibold leading-tight tracking-tight text-foreground",
+				"text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-[30px]",
 				className,
 			)}
 			{...props}

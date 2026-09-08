@@ -1,13 +1,18 @@
 import * as React from "react"
 import { cn } from "cn"
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+type InputProps = Omit<React.ComponentProps<"input">, "size"> & {
+  size?: "default" | "sm"
+}
+
+function Input({ className, type, size = "default", ...props }: InputProps) {
   return (
     <input
       type={type}
       data-slot="input"
+      data-size={size}
       className={cn(
-        "h-auto w-full min-w-0 rounded-[8px] border border-input-border bg-input px-2.5 py-3 text-base leading-5 text-foreground outline-none",
+        "h-auto w-full min-w-0 rounded-[8px] border border-input-border bg-input px-2.5 py-3 text-base leading-5 text-foreground outline-none data-[size=sm]:py-2",
         "transition-[box-shadow,border-color] duration-150 ease-out",
         "placeholder:text-muted-foreground",
         "ring-1 ring-transparent",
@@ -22,4 +27,4 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   )
 }
 
-export { Input }
+export { Input, type InputProps }
