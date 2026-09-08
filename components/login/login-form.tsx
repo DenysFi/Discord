@@ -253,7 +253,7 @@ export function LoginForm() {
 						<TypographyMuted>
 							Нужна учётная запись?{" "}
 							<Link
-								href="/register"
+								href="/sign-up"
 								className="font-medium text-primary hover:underline"
 							>
 								Зарегистрироваться

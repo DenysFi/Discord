@@ -526,7 +526,7 @@ export function RegisterForm() {
 						<TypographyMuted>
 							Уже зарегистрированы?{" "}
 							<Link
-								href="/login"
+								href="/sign-in"
 								className="font-medium text-primary hover:underline"
 							>
 								Войти
