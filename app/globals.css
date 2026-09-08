@@ -14,6 +14,8 @@
   --discord-gray: #2b2b30;
   --discord-muted: #97979f;
   --discord-chat: #2f3035;
+  --discord-panel: #393a41;
+  --discord-input: #35353c;
   --discord-dark: #1a1a1e;
   --discord-darker: #1a1a1e;
   --discord-darkest: #0c0c0d;
@@ -83,8 +85,10 @@
   --destructive-foreground: #ffffff;
   --destructive-foreground-muted: var(--discord-role-red);
   --chat: var(--discord-chat);
+  --panel: var(--discord-panel);
   --border: var(--discord-neutral-700);
-  --input: var(--discord-dark);
+  --input: var(--discord-input);
+  --input-border: color-mix(in srgb, white 8%, transparent);
   --ring: var(--discord-blurple);
   --radius: 0.5rem;
 
@@ -123,12 +127,14 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-input-border: var(--input-border);
   --color-ring: var(--ring);
   --color-destructive: var(--destructive);
   --color-destructive-hover: var(--destructive-hover);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-destructive-foreground-muted: var(--destructive-foreground-muted);
   --color-chat: var(--chat);
+  --color-panel: var(--panel);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -147,6 +153,8 @@
   --color-discord-gray: var(--discord-gray);
   --color-discord-muted: var(--discord-muted);
   --color-discord-chat: var(--discord-chat);
+  --color-discord-panel: var(--discord-panel);
+  --color-discord-input: var(--discord-input);
   --color-discord-dark: var(--discord-dark);
   --color-discord-darker: var(--discord-darker);
   --color-discord-darkest: var(--discord-darkest);
