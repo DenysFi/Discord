@@ -55,11 +55,11 @@ export function LoginForm() {
 		return (
 			<AuthVerificationForm
 				inputId="login-code"
-				title="Подтвердите вход"
-				description="Мы отправили код подтверждения на адрес вашей учётной записи."
-				label="Код подтверждения"
-				submitLabel="Подтвердить вход"
-				pendingLabel="Проверяем…"
+				title="Confirm your identity"
+				description="We sent a verification code to your account email."
+				label="Verification code"
+				submitLabel="Confirm"
+				pendingLabel="Verifying…"
 				isPending={verificationMutation.isPending}
 				error={verificationMutation.error}
 				onSubmit={code => verificationMutation.mutate(code)}
@@ -89,7 +89,7 @@ export function LoginForm() {
 				type: "manual",
 				message:
 					emailResult.error.issues[0]?.message ??
-					"Введите корректный адрес электронной почты.",
+					"Enter a valid email address.",
 			})
 			return
 		}
@@ -107,14 +107,14 @@ export function LoginForm() {
 				noValidate
 			>
 				<header className="flex flex-col gap-2 text-center">
-					<TypographyH1>С возвращением!</TypographyH1>
-					<TypographyP>Мы так рады видеть вас снова!</TypographyP>
+					<TypographyH1>Welcome back!</TypographyH1>
+					<TypographyP>We&apos;re so excited to see you again!</TypographyP>
 				</header>
 
 				<FieldGroup className="gap-5">
 					<Field data-invalid={!!identifierError}>
 						<FieldLabel htmlFor="login-email">
-							Адрес электронной почты или номер телефона{" "}
+							Email or Phone Number{" "}
 							<span className="text-destructive">*</span>
 						</FieldLabel>
 						<Input
@@ -130,7 +130,7 @@ export function LoginForm() {
 
 					<Field data-invalid={!!passwordError}>
 						<FieldLabel htmlFor="login-password">
-							Пароль <span className="text-destructive">*</span>
+							Password <span className="text-destructive">*</span>
 						</FieldLabel>
 						<Input
 							id="login-password"
@@ -148,7 +148,7 @@ export function LoginForm() {
 							disabled={emailLinkMutation.isPending}
 							onClick={handleForgotPassword}
 						>
-							Забыли пароль?
+							Forgot your password?
 						</Button>
 					</Field>
 
@@ -160,15 +160,15 @@ export function LoginForm() {
 							className="w-full"
 							disabled={signInMutation.isPending}
 						>
-							{signInMutation.isPending ? "Входим…" : "Вход"}
+							{signInMutation.isPending ? "Logging in…" : "Log In"}
 						</Button>
 						<TypographyMuted>
-							Нужна учётная запись?{" "}
+							Need an account?{" "}
 							<AuthSwitchLink
 								to="sign-up"
 								className="font-medium text-primary hover:underline"
 							>
-								Зарегистрироваться
+								Register
 							</AuthSwitchLink>
 						</TypographyMuted>
 					</Field>
@@ -178,10 +178,10 @@ export function LoginForm() {
 			<Modal
 				open={forgotPasswordOpen}
 				onOpenChange={setForgotPasswordOpen}
-				title="На вашей почте должно быть письмо с ссылкой для входа"
+				title="Check your email for a login link"
 			>
 				<ModalDescription>
-					Нажмите на ссылку в вашем письме, чтобы войти без пароля.
+					Click the link in your email to sign in without a password.
 				</ModalDescription>
 				<ModalClose asChild>
 					<Button size="lg" className="w-full">

@@ -45,7 +45,7 @@ function useEmailLinkVerify() {
 
 					if (error) {
 						throw new AuthFlowError(
-							getClerkErrorMessage(error, "Не удалось завершить вход."),
+							getClerkErrorMessage(error, "Couldn't complete sign-in."),
 						)
 					}
 
@@ -53,10 +53,10 @@ function useEmailLinkVerify() {
 				}
 
 				throw new AuthFlowError(
-					"Сессия не создана. Вернитесь на страницу входа и запросите новую ссылку.",
+					"Session wasn't created. Return to the login page and request a new link.",
 				)
 			} catch (error) {
-				throw toAuthFlowError(error, "Не удалось завершить вход.")
+				throw toAuthFlowError(error, "Couldn't complete sign-in.")
 			}
 		},
 	})

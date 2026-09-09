@@ -35,18 +35,18 @@ import {
 } from "@/lib/validation/auth"
 
 const MONTHS = [
-	"Январь",
-	"Февраль",
-	"Март",
-	"Апрель",
-	"Май",
-	"Июнь",
-	"Июль",
-	"Август",
-	"Сентябрь",
-	"Октябрь",
-	"Ноябрь",
-	"Декабрь",
+	"January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December",
 ]
 
 const DAYS = Array.from({ length: 31 }, (_, index) => index + 1)
@@ -166,15 +166,15 @@ export function RegisterForm() {
 		return (
 			<AuthVerificationForm
 				inputId="register-code"
-				title="Подтвердите e-mail"
-				description={`Мы отправили код подтверждения на ${form.getValues("email")}.`}
+				title="Verify your email"
+				description={`We sent a verification code to ${form.getValues("email")}.`}
 				label={
 					<>
-						Код подтверждения <RequiredMark />
+						Verification code <RequiredMark />
 					</>
 				}
-				submitLabel="Подтвердить e-mail"
-				pendingLabel="Проверяем…"
+				submitLabel="Verify email"
+				pendingLabel="Verifying…"
 				isPending={verificationMutation.isPending}
 				error={verificationMutation.error}
 				onSubmit={code => verificationMutation.mutate(code)}
@@ -195,7 +195,7 @@ export function RegisterForm() {
 				noValidate
 			>
 				<header className="text-center">
-					<TypographyH1>Создать учётную запись</TypographyH1>
+					<TypographyH1>Create an account</TypographyH1>
 				</header>
 
 				<FieldGroup className="gap-2 group-data-[invalid=true]/register-form:gap-1">
@@ -204,7 +204,7 @@ export function RegisterForm() {
 						data-invalid={!!emailError}
 					>
 						<FieldLabel htmlFor="register-email">
-							E-mail <RequiredMark />
+							Email <RequiredMark />
 						</FieldLabel>
 						<Input
 							id="register-email"
@@ -226,7 +226,7 @@ export function RegisterForm() {
 						data-invalid={!!errors.displayName}
 					>
 						<FieldLabel htmlFor="register-display-name">
-							Отображаемое имя
+							Display Name
 						</FieldLabel>
 						<Input
 							id="register-display-name"
@@ -247,7 +247,7 @@ export function RegisterForm() {
 						data-invalid={!!usernameError}
 					>
 						<FieldLabel htmlFor="register-username">
-							Имя пользователя <RequiredMark />
+							Username <RequiredMark />
 						</FieldLabel>
 						<Input
 							id="register-username"
@@ -269,7 +269,7 @@ export function RegisterForm() {
 						data-invalid={!!passwordError}
 					>
 						<FieldLabel htmlFor="register-password">
-							Пароль <RequiredMark />
+							Password <RequiredMark />
 						</FieldLabel>
 						<Input
 							id="register-password"
@@ -291,24 +291,24 @@ export function RegisterForm() {
 						data-invalid={!!birthDateError}
 					>
 						<FieldLegend variant="label">
-							Дата рождения <RequiredMark />
+							Date of Birth <RequiredMark />
 						</FieldLegend>
 						<div className="grid grid-cols-3 gap-3">
 							<BirthDateSelect
 								control={form.control}
-								label="День"
+								label="Day"
 								name="birthDay"
 								options={DAYS}
 							/>
 							<BirthDateSelect
 								control={form.control}
-								label="Месяц"
+								label="Month"
 								name="birthMonth"
 								options={MONTHS}
 							/>
 							<BirthDateSelect
 								control={form.control}
-								label="Год"
+								label="Year"
 								name="birthYear"
 								options={YEARS}
 							/>
@@ -340,8 +340,8 @@ export function RegisterForm() {
 											htmlFor="register-marketing"
 											className="text-sm leading-snug font-normal tracking-normal text-muted-foreground normal-case group-data-[invalid=true]/register-form:text-xs group-data-[invalid=true]/register-form:leading-tight"
 										>
-											(Необязательно) Я не против получать электронные письма с
-											новостями Discord, советами и специальными предложениями.
+											(Optional) It&apos;s okay to send me emails with Discord
+											updates, tips, and special offers.
 										</FieldLabel>
 									</FieldContent>
 								</Field>
@@ -375,21 +375,21 @@ export function RegisterForm() {
 											className="text-sm leading-snug font-normal tracking-normal text-muted-foreground normal-case group-data-[invalid=true]/register-form:text-xs group-data-[invalid=true]/register-form:leading-tight"
 										>
 											<span>
-												Подтверждаю ознакомление и согласие с{" "}
+												I have read and agree to Discord&apos;s{" "}
 												<Link
 													href="https://discord.com/terms"
 													className="text-primary hover:underline"
 												>
-													Условиями использования
+													Terms of Service
 												</Link>{" "}
-												и{" "}
+												and{" "}
 												<Link
 													href="https://discord.com/privacy"
 													className="text-primary hover:underline"
 												>
-													Политикой конфиденциальности
-												</Link>{" "}
-												Discord.
+													Privacy Policy
+												</Link>
+												.
 											</span>
 										</FieldLabel>
 										<FieldError
@@ -413,17 +413,15 @@ export function RegisterForm() {
 							className="w-full"
 							disabled={isSubmitting}
 						>
-							{isSubmitting
-								? "Создаём учётную запись…"
-								: "Создать учётную запись"}
+							{isSubmitting ? "Creating account…" : "Continue"}
 						</Button>
 						<TypographyMuted>
-							Уже зарегистрированы?{" "}
+							Already have an account?{" "}
 							<AuthSwitchLink
 								to="sign-in"
 								className="font-medium text-primary hover:underline"
 							>
-								Войти
+								Log In
 							</AuthSwitchLink>
 						</TypographyMuted>
 					</Field>

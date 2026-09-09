@@ -35,7 +35,7 @@ function VerifyState({
 function BackToSignIn() {
 	return (
 		<Button asChild size="lg" className="w-full">
-			<Link href="/sign-in">Вернуться ко входу</Link>
+			<Link href="/sign-in">Back to Login</Link>
 		</Button>
 	)
 }
@@ -46,8 +46,8 @@ export default function SignInVerifyPage() {
 	if (!isLoaded || !verification) {
 		return (
 			<VerifyState
-				title="Проверяем ссылку…"
-				description="Подождите, идёт подтверждение входа."
+				title="Verifying link…"
+				description="Please wait while we confirm your sign-in."
 			/>
 		)
 	}
@@ -55,8 +55,8 @@ export default function SignInVerifyPage() {
 	if (verification.status === "failed") {
 		return (
 			<VerifyState
-				title="Ссылка не сработала"
-				description="Не удалось подтвердить вход по ссылке. Запросите новую на странице входа."
+				title="Link didn't work"
+				description="We couldn't verify your sign-in link. Request a new one on the login page."
 				footer={<BackToSignIn />}
 			/>
 		)
@@ -65,8 +65,8 @@ export default function SignInVerifyPage() {
 	if (verification.status === "expired") {
 		return (
 			<VerifyState
-				title="Ссылка устарела"
-				description="Срок действия ссылки истёк. Запросите новую на странице входа."
+				title="Link expired"
+				description="This link has expired. Request a new one on the login page."
 				footer={<BackToSignIn />}
 			/>
 		)
@@ -75,11 +75,11 @@ export default function SignInVerifyPage() {
 	if (verification.status === "client_mismatch") {
 		return (
 			<VerifyState
-				title="Вернитесь во вкладку со входом"
-				description="Ссылка подтверждена. Вход завершится в том браузере, где вы нажали «Забыли пароль?». Эту вкладку можно закрыть."
+				title="Return to the login tab"
+				description="The link was confirmed. Sign-in will finish in the browser where you clicked “Forgot your password?”. You can close this tab."
 				footer={
 					<TypographyMuted className="text-center">
-						Если вход не произошёл — откройте ссылку в том же браузере.
+						If you weren&apos;t signed in, open the link in the same browser.
 					</TypographyMuted>
 				}
 			/>
@@ -89,11 +89,11 @@ export default function SignInVerifyPage() {
 	if (completeQuery.isError) {
 		return (
 			<VerifyState
-				title="Не удалось войти"
+				title="Couldn't sign in"
 				description={
 					completeQuery.error instanceof Error
 						? completeQuery.error.message
-						: "Не удалось завершить вход."
+						: "Couldn't complete sign-in."
 				}
 				footer={<BackToSignIn />}
 			/>
@@ -102,8 +102,8 @@ export default function SignInVerifyPage() {
 
 	return (
 		<VerifyState
-			title="Входим в аккаунт…"
-			description="Подождите, сейчас откроется приложение."
+			title="Signing you in…"
+			description="Please wait while we open the app."
 		/>
 	)
 }

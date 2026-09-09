@@ -79,7 +79,7 @@ function Modal({
 									className="-mt-1 -mr-1 shrink-0 text-muted-foreground hover:text-foreground"
 								>
 									<XIcon />
-									<span className="sr-only">Закрыть</span>
+									<span className="sr-only">Close</span>
 								</Button>
 							</DialogPrimitive.Close>
 						) : null}

@@ -39,7 +39,7 @@ function useSignUpFlow() {
 
 		if (error) {
 			throw new AuthFlowError(
-				getClerkErrorMessage(error, "Не удалось завершить регистрацию."),
+				getClerkErrorMessage(error, "Couldn't complete registration."),
 			)
 		}
 	}
@@ -61,7 +61,7 @@ function useSignUpFlow() {
 
 				if (error) {
 					throw new AuthFlowError(
-						getClerkErrorMessage(error, "Не удалось создать учётную запись."),
+						getClerkErrorMessage(error, "Couldn't create your account."),
 					)
 				}
 
@@ -77,7 +77,7 @@ function useSignUpFlow() {
 					throw new AuthFlowError(
 						getClerkErrorMessage(
 							sendCodeError,
-							"Не удалось отправить код подтверждения.",
+							"Couldn't send the verification code.",
 						),
 					)
 				}
@@ -86,7 +86,7 @@ function useSignUpFlow() {
 			} catch (error) {
 				throw toAuthFlowError(
 					error,
-					"Не удалось связаться с сервисом авторизации.",
+					"Couldn't reach the authentication service.",
 				)
 			}
 		},
@@ -103,7 +103,7 @@ function useSignUpFlow() {
 			const trimmedCode = code.trim()
 
 			if (!trimmedCode) {
-				throw new AuthFlowError("Введите код из письма.")
+				throw new AuthFlowError("Enter the code from your email.")
 			}
 
 			try {
@@ -113,13 +113,13 @@ function useSignUpFlow() {
 
 				if (error) {
 					throw new AuthFlowError(
-						getClerkErrorMessage(error, "Код подтверждения недействителен."),
+						getClerkErrorMessage(error, "Invalid verification code."),
 					)
 				}
 
 				if (signUp.status !== "complete") {
 					throw new AuthFlowError(
-						"Для завершения регистрации требуются дополнительные данные.",
+						"Additional information is required to finish registration.",
 					)
 				}
 
@@ -127,7 +127,7 @@ function useSignUpFlow() {
 			} catch (error) {
 				throw toAuthFlowError(
 					error,
-					"Не удалось проверить код. Попробуйте ещё раз.",
+					"Couldn't verify the code. Please try again.",
 				)
 			}
 		},

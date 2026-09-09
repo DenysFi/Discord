@@ -47,7 +47,7 @@ function useSignInFlow() {
 
 		if (error) {
 			throw new AuthFlowError(
-				getClerkErrorMessage(error, "Не удалось завершить вход."),
+				getClerkErrorMessage(error, "Couldn't complete sign-in."),
 			)
 		}
 	}
@@ -63,7 +63,7 @@ function useSignInFlow() {
 
 				if (error) {
 					throw new AuthFlowError(
-						getClerkErrorMessage(error, "Проверьте данные для входа."),
+						getClerkErrorMessage(error, "Check your login details."),
 					)
 				}
 
@@ -81,7 +81,7 @@ function useSignInFlow() {
 
 				if (!needsEmailCode) {
 					throw new AuthFlowError(
-						"Не удалось завершить вход. Попробуйте ещё раз.",
+						"Couldn't complete sign-in. Please try again.",
 					)
 				}
 
@@ -91,7 +91,7 @@ function useSignInFlow() {
 					throw new AuthFlowError(
 						getClerkErrorMessage(
 							sendCodeError,
-							"Не удалось отправить код подтверждения.",
+							"Couldn't send the verification code.",
 						),
 					)
 				}
@@ -100,7 +100,7 @@ function useSignInFlow() {
 			} catch (error) {
 				throw toAuthFlowError(
 					error,
-					"Не удалось связаться с сервисом авторизации.",
+					"Couldn't reach the authentication service.",
 				)
 			}
 		},
@@ -117,7 +117,7 @@ function useSignInFlow() {
 			const trimmedCode = code.trim()
 
 			if (!trimmedCode) {
-				throw new AuthFlowError("Введите код из письма.")
+				throw new AuthFlowError("Enter the code from your email.")
 			}
 
 			try {
@@ -127,13 +127,13 @@ function useSignInFlow() {
 
 				if (error) {
 					throw new AuthFlowError(
-						getClerkErrorMessage(error, "Код подтверждения недействителен."),
+						getClerkErrorMessage(error, "Invalid verification code."),
 					)
 				}
 
 				if (signIn.status !== "complete") {
 					throw new AuthFlowError(
-						"Не удалось завершить дополнительную проверку.",
+						"Couldn't complete additional verification.",
 					)
 				}
 
@@ -141,7 +141,7 @@ function useSignInFlow() {
 			} catch (error) {
 				throw toAuthFlowError(
 					error,
-					"Не удалось проверить код. Попробуйте ещё раз.",
+					"Couldn't verify the code. Please try again.",
 				)
 			}
 		},
@@ -153,7 +153,7 @@ function useSignInFlow() {
 			const { error } = await signIn.emailLink.waitForVerification()
 
 			if (error) {
-				throw toAuthFlowError(error, "Не удалось подтвердить ссылку.")
+				throw toAuthFlowError(error, "Couldn't verify the link.")
 			}
 
 			const sessionId = signIn.emailLink.verification?.createdSessionId
@@ -197,7 +197,7 @@ function useSignInFlow() {
 					throw new AuthFlowError(
 						getClerkErrorMessage(
 							error,
-							"Не удалось отправить ссылку для входа.",
+							"Couldn't send the sign-in link.",
 						),
 					)
 				}
@@ -206,7 +206,7 @@ function useSignInFlow() {
 			} catch (error) {
 				throw toAuthFlowError(
 					error,
-					"Не удалось отправить ссылку для входа.",
+					"Couldn't send the sign-in link.",
 				)
 			}
 		},

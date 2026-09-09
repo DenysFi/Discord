@@ -5,49 +5,49 @@ const PHONE_PATTERN = /^\+?[0-9\s()-]{7,20}$/
 const loginIdentifierSchema = z
 	.string()
 	.trim()
-	.min(1, "Введите адрес электронной почты или номер телефона.")
+	.min(1, "Enter an email address or phone number.")
 	.refine(
 		value => z.email().safeParse(value).success || PHONE_PATTERN.test(value),
-		"Введите корректный адрес электронной почты или номер телефона.",
+		"Enter a valid email address or phone number.",
 	)
 
 const loginSchema = z.object({
 	identifier: loginIdentifierSchema,
-	password: z.string().min(1, "Введите пароль."),
+	password: z.string().min(1, "Enter your password."),
 })
 
 /** Email-only check for passwordless / magic-link entry. */
 const loginEmailSchema = z
 	.string()
 	.trim()
-	.min(1, "Введите адрес электронной почты.")
+	.min(1, "Enter an email address.")
 	.refine(
 		value => z.email().safeParse(value).success,
-		"Введите корректный адрес электронной почты.",
+		"Enter a valid email address.",
 	)
 
 const registerSchema = z
 	.object({
-		email: z.email("Введите корректный адрес электронной почты."),
+		email: z.email("Enter a valid email address."),
 		displayName: z
 			.string()
 			.trim()
-			.max(32, "Отображаемое имя не должно превышать 32 символа."),
+			.max(32, "Display name must be 32 characters or fewer."),
 		username: z
 			.string()
 			.trim()
-			.min(2, "Имя пользователя должно содержать минимум 2 символа.")
-			.max(32, "Имя пользователя не должно превышать 32 символа."),
+			.min(2, "Username must be at least 2 characters.")
+			.max(32, "Username must be 32 characters or fewer."),
 		password: z
 			.string()
-			.min(8, "Пароль должен содержать минимум 8 символов.")
-			.max(72, "Пароль не должен превышать 72 символа."),
-		birthDay: z.string().min(1, "Выберите день рождения."),
-		birthMonth: z.string().min(1, "Выберите месяц рождения."),
-		birthYear: z.string().min(1, "Выберите год рождения."),
+			.min(8, "Password must be at least 8 characters.")
+			.max(72, "Password must be 72 characters or fewer."),
+		birthDay: z.string().min(1, "Select a day of birth."),
+		birthMonth: z.string().min(1, "Select a month of birth."),
+		birthYear: z.string().min(1, "Select a year of birth."),
 		marketing: z.boolean(),
 		terms: z.boolean().refine(value => value, {
-			message: "Необходимо принять условия использования.",
+			message: "You must agree to the Terms of Service.",
 		}),
 	})
 	.superRefine((values, context) => {
@@ -65,7 +65,7 @@ const registerSchema = z
 		) {
 			context.addIssue({
 				code: "custom",
-				message: "Укажите корректную дату рождения.",
+				message: "Enter a valid date of birth.",
 				path: ["birthDay"],
 			})
 			return
@@ -83,7 +83,7 @@ const registerSchema = z
 		if (birthDate > minimumBirthDate) {
 			context.addIssue({
 				code: "custom",
-				message: "Для регистрации вам должно быть не менее 13 лет.",
+				message: "You must be at least 13 years old to register.",
 				path: ["birthDay"],
 			})
 		}
