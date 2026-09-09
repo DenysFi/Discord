@@ -1,6 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 
 import { AuthPanel } from "@/components/auth/auth-panel"
@@ -16,17 +17,28 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {
+	Modal,
+	ModalClose,
+	ModalDescription,
+} from "@/components/ui/modal"
+import {
 	TypographyH1,
 	TypographyMuted,
 	TypographyP,
 } from "@/components/ui/typography"
-import { loginSchema, type LoginFormValues } from "@/lib/validation/auth"
+import {
+	loginEmailSchema,
+	loginSchema,
+	type LoginFormValues,
+} from "@/lib/validation/auth"
 
 export function LoginForm() {
+	const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false)
 	const {
 		step,
 		signInMutation,
 		verificationMutation,
+		emailLinkMutation,
 		fieldErrors,
 		globalErrors,
 	} = useSignInFlow()
@@ -65,8 +77,27 @@ export function LoginForm() {
 	)
 	const submitErrors = [
 		signInMutation.error ?? undefined,
+		emailLinkMutation.error ?? undefined,
 		...(globalErrors ?? []),
 	].filter(error => error && !shownFieldMessages.has(error.message))
+
+	function handleForgotPassword() {
+		const emailResult = loginEmailSchema.safeParse(form.getValues("identifier"))
+
+		if (!emailResult.success) {
+			form.setError("identifier", {
+				type: "manual",
+				message:
+					emailResult.error.issues[0]?.message ??
+					"Введите корректный адрес электронной почты.",
+			})
+			return
+		}
+
+		form.clearErrors("identifier")
+		setForgotPasswordOpen(true)
+		emailLinkMutation.mutate(emailResult.data)
+	}
 
 	return (
 		<AuthPanel orientation="vertical" className="w-full max-w-[480px]">
@@ -110,7 +141,13 @@ export function LoginForm() {
 							{...form.register("password")}
 						/>
 						<FieldError errors={[passwordError]} />
-						<Button variant="link" className="w-fit justify-start">
+						<Button
+							type="button"
+							variant="link"
+							className="w-fit justify-start"
+							disabled={emailLinkMutation.isPending}
+							onClick={handleForgotPassword}
+						>
 							Забыли пароль?
 						</Button>
 					</Field>
@@ -137,6 +174,21 @@ export function LoginForm() {
 					</Field>
 				</FieldGroup>
 			</form>
+
+			<Modal
+				open={forgotPasswordOpen}
+				onOpenChange={setForgotPasswordOpen}
+				title="На вашей почте должно быть письмо с ссылкой для входа"
+			>
+				<ModalDescription>
+					Нажмите на ссылку в вашем письме, чтобы войти без пароля.
+				</ModalDescription>
+				<ModalClose asChild>
+					<Button size="lg" className="w-full">
+						OK
+					</Button>
+				</ModalClose>
+			</Modal>
 		</AuthPanel>
 	)
 }

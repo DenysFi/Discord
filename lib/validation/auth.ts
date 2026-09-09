@@ -16,6 +16,16 @@ const loginSchema = z.object({
 	password: z.string().min(1, "Введите пароль."),
 })
 
+/** Email-only check for passwordless / magic-link entry. */
+const loginEmailSchema = z
+	.string()
+	.trim()
+	.min(1, "Введите адрес электронной почты.")
+	.refine(
+		value => z.email().safeParse(value).success,
+		"Введите корректный адрес электронной почты.",
+	)
+
 const registerSchema = z
 	.object({
 		email: z.email("Введите корректный адрес электронной почты."),
@@ -80,11 +90,14 @@ const registerSchema = z
 	})
 
 type LoginFormValues = z.infer<typeof loginSchema>
+type LoginEmail = z.infer<typeof loginEmailSchema>
 type RegisterFormValues = z.infer<typeof registerSchema>
 
 export {
+	loginEmailSchema,
 	loginSchema,
 	registerSchema,
+	type LoginEmail,
 	type LoginFormValues,
 	type RegisterFormValues,
 }

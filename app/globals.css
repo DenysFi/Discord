@@ -88,6 +88,14 @@
   --destructive-foreground-muted: var(--discord-role-red);
   --chat: var(--discord-chat);
   --panel: var(--discord-panel);
+  --modal: #242429;
+  --opacity-black-72-hsl: 0 0% 0%;
+  --background-scrim: color-mix(
+    in oklab,
+    hsl(var(--opacity-black-72-hsl) / 0.7215686274509804) 100%,
+    hsl(var(--custom-theme-base-color-hsl, 0 0% 0%) / 0.7215686274509804)
+      var(--custom-theme-base-color-amount, 0%)
+  );
   --border: var(--discord-neutral-700);
   --input: var(--discord-input);
   --input-border: color-mix(in srgb, white 8%, transparent);
@@ -137,6 +145,8 @@
   --color-destructive-foreground-muted: var(--destructive-foreground-muted);
   --color-chat: var(--chat);
   --color-panel: var(--panel);
+  --color-modal: var(--modal);
+  --color-background-scrim: var(--background-scrim);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
